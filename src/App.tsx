@@ -1,36 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
+} from 'react-router-dom';
 import ChatRoom from './ChatRoom';
 import Auth from './Auth';
 import { supabase } from './supabaseClient';
 
+// ---------- Main App ----------
 const App: React.FC = () => {
   const [session, setSession] = useState<any>(null);
   const [room, setRoom] = useState('');
   const [joined, setJoined] = useState(false);
 
+  return (
+    <Router>
+      <SessionListener setSession={setSession} />
+      {!session ? (
+        <Auth
+          onAuth={async () => {
+            const { data } = await supabase.auth.getSession();
+            setSession(data.session);
+          }}
+        />
+      ) : (
+        <MainApp session={session} room={room} setRoom={setRoom} joined={joined} setJoined={setJoined} />
+      )}
+    </Router>
+  );
+};
+
+export default App;
+
+// ---------- SessionListener ----------
+const SessionListener: React.FC<{ setSession: (session: any) => void }> = ({ setSession }) => {
+  const navigate = useNavigate();
+  const [hasRedirected, setHasRedirected] = useState(false);
+
   useEffect(() => {
-    const getSession = async () => {
+    const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+      if (session) {
+        setSession(session);
+        if (!hasRedirected) {
+          navigate('/cs278/home', { replace: true });
+          setHasRedirected(true);
+        }
+      }
     };
 
-    getSession();
+    init();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      if (session) {
+        setSession(session);
+        if (!hasRedirected) {
+          navigate('/home', { replace: true });
+          setHasRedirected(true);
+        }
+      } else {
+        setSession(null);
+        setHasRedirected(false);
+      }
     });
 
     return () => {
       listener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate, setSession, hasRedirected]);
 
-  // Fetch room from profile after login
+  return null;
+};
+
+// ---------- MainApp ----------
+const MainApp: React.FC<{
+  session: any;
+  room: string;
+  setRoom: (room: string) => void;
+  joined: boolean;
+  setJoined: (j: boolean) => void;
+}> = ({ session, room, setRoom, joined, setJoined }) => {
+  const userName =
+    session?.user?.user_metadata?.full_name ||
+    session?.user?.email ||
+    'Anonymous';
+
   useEffect(() => {
     const fetchRoom = async () => {
-      if (!session?.user) return;
-
       const { data, error } = await supabase
         .from('profiles')
         .select('room')
@@ -38,7 +98,7 @@ const App: React.FC = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching profile room:', error.message);
+        console.error('Error fetching room:', error.message);
         return;
       }
 
@@ -49,24 +109,16 @@ const App: React.FC = () => {
     };
 
     fetchRoom();
-  }, [session]);
-
-  const userName =
-    session?.user?.user_metadata?.full_name ||
-    session?.user?.email ||
-    'Anonymous';
-
-  if (!session) {
-    return <Auth onAuth={() => supabase.auth.getSession().then(({ data }) => setSession(data.session))} />;
-  }
+  }, [session, setRoom, setJoined]);
 
   return (
-    <Router>
+    <>
       <main style={{ paddingBottom: '60px' }}>
         <Routes>
-          <Route path="/" element={<Page title="Home" />} />
+          <Route path="/cs278" element={<Navigate to="/cs278/home" />} />
+          <Route path="/cs278/home" element={<Page title="Home" />} />
           <Route
-            path="/chat"
+            path="/cs278/chat"
             element={
               joined ? (
                 <ChatRoom userName={userName} room={room || 'default'} />
@@ -75,24 +127,28 @@ const App: React.FC = () => {
               )
             }
           />
-          <Route path="/profile" element={<ProfilePage session={session} />} />
+          <Route path="/cs278/profile" element={<ProfilePage session={session} />} />
         </Routes>
       </main>
-
       <BottomNav />
-    </Router>
+    </>
   );
 };
 
-export default App;
+// ---------- Page ----------
+const Page: React.FC<{ title: string }> = ({ title }) => (
+  <div style={{ padding: '1rem' }}>
+    <h1>{title}</h1>
+  </div>
+);
 
-// ProfilePage with Logout Button
+// ---------- ProfilePage ----------
 const ProfilePage: React.FC<{ session: any }> = ({ session }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/');
+    navigate('/cs278');
   };
 
   return (
@@ -104,14 +160,7 @@ const ProfilePage: React.FC<{ session: any }> = ({ session }) => {
   );
 };
 
-// Basic Page Component (unchanged)
-const Page: React.FC<{ title: string }> = ({ title }) => (
-  <div style={{ padding: '1rem' }}>
-    <h1>{title}</h1>
-  </div>
-);
-
-// Bottom navigation (unchanged)
+// ---------- BottomNav ----------
 const BottomNav: React.FC = () => (
   <nav
     style={{
@@ -125,12 +174,13 @@ const BottomNav: React.FC = () => (
       padding: '10px 0',
     }}
   >
-    <NavLink to="/" label="Home" />
-    <NavLink to="/chat" label="Chat" />
-    <NavLink to="/profile" label="Profile" />
+    <NavLink to="/cs278/home" label="Home" />
+    <NavLink to="/cs278/chat" label="Chat" />
+    <NavLink to="/cs278/profile" label="Profile" />
   </nav>
 );
 
+// ---------- NavLink ----------
 const NavLink: React.FC<{ to: string; label: string }> = ({ to, label }) => (
   <Link
     to={to}
