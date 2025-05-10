@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import {  Navigate } from 'react-router-dom';
 import ChatRoom from './ChatRoom';
 import HomePage from './HomePage';
 import ProfilePage from './ProfilePage';
@@ -44,25 +45,22 @@ const MainApp: React.FC<{
   return (
     <>
       <main style={{ paddingBottom: '60px' }}>
-        <Routes>
-          <Route path="/cs278" element={<Navigate to="/cs278/home" />} />
-          <Route
-            path="/cs278/home"
-            element={<HomePage title="Home" userId={session?.user?.id} />}
-            />
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<HomePage title="Home" userId={session?.user?.id} />} />
             <Route path="/complete/:challengeId" element={<ChallengeCompletePage userId={session?.user?.id} />} />
-          <Route
-            path="/cs278/chat"
-            element={
-              joined ? (
-                <ChatRoom userName={userName} room={room || 'default'} />
-              ) : (
-                <div style={{ padding: '1rem' }}>Loading room info...</div>
-              )
-            }
-          />
-          <Route path="/cs278/profile" element={<ProfilePage session={session} />} />
-        </Routes>
+            <Route
+              path="/chat"
+              element={
+                joined ? (
+                  <ChatRoom userName={userName} room={room || 'default'} />
+                ) : (
+                  <div style={{ padding: '1rem' }}>Loading room info...</div>
+                )
+              }
+            />
+            <Route path="/profile" element={<ProfilePage session={session} />} />
+          </Routes>
       </main>
       <BottomNav />
     </>

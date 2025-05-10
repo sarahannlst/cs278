@@ -14,9 +14,9 @@ const BottomNav: React.FC = () => (
       padding: '10px 0',
     }}
   >
-    <NavLink to="/cs278/home" label="Home" />
-    <NavLink to="/cs278/chat" label="Chat" />
-    <NavLink to="/cs278/profile" label="Profile" />
+    <NavLink to="/home" label="Home" />
+    <NavLink to="/chat" label="Chat" />
+    <NavLink to="/profile" label="Profile" />
   </nav>
 );
 
