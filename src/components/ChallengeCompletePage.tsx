@@ -23,10 +23,18 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
     setUploading(true);
     setError(null);
 
-    const filePath = `challenge_photos/${Date.now()}_${imageFile.name}`;
+    const sanitizeFileName = (name: string) => {
+      return name
+        .normalize("NFKD")
+        .replace(/[^\w.-]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    };
+
+    const filePath = `challenge_photos/${Date.now()}_${sanitizeFileName(imageFile.name)}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('photos') // ensure your bucket is named 'photos'
+      .from('photos')
       .upload(filePath, imageFile);
 
     if (uploadError) {
@@ -50,8 +58,9 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       return;
     }
 
-    navigate('/cs278/home');
+    navigate('/home');
   };
+
 
   return (
     <div>
@@ -62,7 +71,7 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       <input
         type="file"
         accept="image/*"
-        capture="environment" // or "user" for front-facing camera
+        // capture="environment" // or "user" for front-facing camera
         onChange={(e) => setImageFile(e.target.files?.[0] || null)}
       />
       <br />
