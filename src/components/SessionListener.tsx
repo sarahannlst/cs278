@@ -12,7 +12,7 @@ const SessionListener: React.FC<{ setSession: (session: any) => void }> = ({ set
       if (session) {
         setSession(session);
         if (!hasRedirected) {
-          navigate('/cs278/home', { replace: true });
+          navigate('/home', { replace: true });
           setHasRedirected(true);
         }
       }
