@@ -47,7 +47,16 @@ const MainApp: React.FC<{
       <main style={{ paddingBottom: '60px' }}>
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/home" element={<HomePage title="Home" userId={session?.user?.id} />} />
+            <Route
+              path="/home"
+              element={
+                <HomePage
+                  title="Home"
+                  userId={session?.user?.id}
+                  room={room}
+                />
+              }
+            />
             <Route path="/complete/:challengeId" element={<ChallengeCompletePage userId={session?.user?.id} />} />
             <Route
               path="/chat"
