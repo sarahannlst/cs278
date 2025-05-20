@@ -20,7 +20,7 @@ interface LeaderboardEntry {
 interface HomePageProps {
   title: string;
   userId: string | null | undefined;
-  room: string; // New prop for leaderboard context
+  room: string;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
@@ -40,7 +40,6 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
       setLoading(true);
 
       try {
-        // Fetch completed challenge IDs
         const { data: completed, error: completedError } = await supabase
           .from('user_challenges')
           .select('challenge_id')
@@ -50,7 +49,6 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
 
         const completedIds = completed ? completed.map((row) => row.challenge_id) : [];
 
-        // Fetch uncompleted challenges
         let query = supabase.from('challenges').select('*');
         if (completedIds.length > 0) {
           query = query.not('id', 'in', `(${completedIds.join(',')})`);
@@ -61,7 +59,6 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
 
         setChallenges(uncompleted || []);
 
-        // Fetch leaderboard for the room
         const { data: leaderboardData, error: leaderboardError } = await supabase
           .from('leaderboard')
           .select('*')
@@ -86,11 +83,11 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>{title}</h1>
+    <div style={{ padding: '1rem', fontFamily: "'Comic Sans MS', cursive, sans-serif", background: '#fff7e6' }}>
+      <h2 style={{ fontSize: '1.5rem', color: '#5c3c10', marginBottom: '1rem' }}>🍽 your leftovers</h2>
 
       {loading ? (
-        <p>Loading challenges and leaderboard...</p>
+        <p>Loading your fun tasks...</p>
       ) : (
         <>
           {/* Challenges Section */}
@@ -99,40 +96,77 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
           ) : (
             <ul style={{ listStyleType: 'none', padding: 0 }}>
               {challenges.map((challenge) => (
-                <li key={challenge.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <li
+                  key={challenge.id}
+                  style={{
+                    background: '#fff2cc',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    marginBottom: '0.75rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
                   <div>
-                    <strong>{challenge.title}</strong> – {challenge.description} ({challenge.points} pts)
+                    <strong style={{ color: '#5c3c10' }}>{challenge.title}</strong>: {challenge.description}
                   </div>
-                  <button onClick={() => handleCompleteClick(challenge.id)}>Complete</button>
+                  <button
+                    onClick={() => handleCompleteClick(challenge.id)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '1.5rem',
+                      cursor: 'pointer'
+                    }}
+                    title="Complete this challenge"
+                  >
+                    📸
+                  </button>
                 </li>
               ))}
             </ul>
           )}
 
           {/* Leaderboard Section */}
-          <h2 style={{ marginTop: '2rem' }}>🏆 Leaderboard</h2>
+          <h2 style={{ fontSize: '1.5rem', color: '#5c3c10', marginTop: '2rem' }}>🏆 leaderboard</h2>
           {leaderboard.length === 0 ? (
             <p>No leaderboard data available for this room.</p>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-              <thead>
-                <tr>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Name</th>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'right' }}>Points</th>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'right' }}>Challenges Completed</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((entry) => (
-                  <tr key={entry.user_id}>
-                    <td>{entry.name}</td>
-                    <td style={{ textAlign: 'right' }}>{entry.total_points}</td>
-                    <td style={{ textAlign: 'right' }}>{entry.challenges_completed}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+              <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-end' }}>
+                {leaderboard
+                  .slice(0, 3)
+                  .map((entry, index) => {
+                    const ranks = ['🥇', '🥈', '🥉'];
+                    const heights = ['120px', '80px', '70px'];
+                    const colors = ['#ffd700', '#ccc', '#cd7f32'];
+
+                    return (
+                      <div key={entry.user_id} style={{ textAlign: 'center' }}>
+                        <div
+                          style={{
+                            height: heights[index],
+                            width: '70px',
+                            backgroundColor: colors[index],
+                            borderRadius: '10px 10px 0 0',
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
+                            paddingBottom: '0.5rem'
+                          }}
+                        >
+                          <div style={{ fontSize: '2rem' }}>🐭</div>
+                        </div>
+                        <div style={{ marginTop: '0.3rem', fontWeight: 'bold' }}>{ranks[index]} {entry.name}</div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
           )}
+
         </>
       )}
     </div>
