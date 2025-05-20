@@ -106,7 +106,7 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       />
       <br />
       <button onClick={handleUpload} disabled={uploading}>
-        {uploading ? 'Uploading...' : 'Submit & Complete'}
+        {uploading ? 'Uploading...' : 'Complete Challenge & Send to Chat'}
       </button>
     </div>
   );
