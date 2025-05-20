@@ -49,7 +49,6 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
     };
   }, [room]);
 
-  // Function to check if the room exists by checking messages in that room
   async function checkRoomExists(room: string) {
     const { data, error } = await supabase
       .from('messages')
@@ -58,7 +57,6 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
       .limit(1);
 
     if (error || !data || data.length === 0) {
-      // Room does not exist, insert a placeholder message to create the room
       const { error: insertError } = await supabase.from('messages').insert([
         {
           user_name: 'System',
@@ -78,7 +76,6 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
     }
   }
 
-  // Function to load messages for the room
   async function loadMessages() {
     const { data } = await supabase
       .from('messages')
@@ -91,7 +88,6 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
     }
   }
 
-  // Function to send a new message to the room
   async function sendMessage() {
     if (newMsg.trim()) {
       await supabase.from('messages').insert([
@@ -109,12 +105,18 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
     <div>
       <h2>Room: {room}</h2>
       {!roomExists && <p style={{ color: 'green' }}>New room created!</p>}
-      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {messages.map((msg, i) => (
-          <div key={i}>
-            <strong>{msg.user_name}:</strong> {msg.content}
-          </div>
-        ))}
+      <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
+        <div style={{ maxWidth: '100%' }}>
+          {messages.map((msg, i) => (
+            <div key={i}>
+              <strong>{msg.user_name}:</strong>{' '}
+              <span
+                dangerouslySetInnerHTML={{ __html: msg.content }}
+                style={{ display: 'inline-block', maxWidth: '100%' }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
       <input
         type="text"

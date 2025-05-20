@@ -58,9 +58,34 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       return;
     }
 
+    // 🧩 Fetch user's room **and name** from profile table
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('room, name')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profileData?.room || !profileData?.name) {
+      console.error('Failed to fetch user profile:', profileError?.message);
+      setUploading(false);
+      return;
+    }
+
+    const room = profileData.room;
+    const userName = profileData.name;
+
+    const publicUrl = supabase.storage.from('photos').getPublicUrl(filePath).data.publicUrl;
+
+    await supabase.from('messages').insert([
+      {
+        user_name: 'System',
+        content: `🎉 <b>${userName}</b> completed a challenge!<br/>Caption: ${caption}<br/><img src="${publicUrl}" alt="Challenge Image" style="max-width: 25%;" />`,
+        room,
+      },
+    ]);
+
     navigate('/home');
   };
-
 
   return (
     <div>
@@ -71,7 +96,6 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       <input
         type="file"
         accept="image/*"
-        // capture="environment" // or "user" for front-facing camera
         onChange={(e) => setImageFile(e.target.files?.[0] || null)}
       />
       <br />
