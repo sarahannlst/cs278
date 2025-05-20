@@ -21,9 +21,7 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
   const [roomExists, setRoomExists] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if the room exists, and create if not
     checkRoomExists(room);
-
     loadMessages();
 
     const ch = supabase
@@ -102,29 +100,80 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
   }
 
   return (
-    <div>
-      <h2>Room: {room}</h2>
-      {!roomExists && <p style={{ color: 'green' }}>New room created!</p>}
-      <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
-        <div style={{ maxWidth: '100%' }}>
-          {messages.map((msg, i) => (
-            <div key={i}>
-              <strong>{msg.user_name}:</strong>{' '}
-              <span
-                dangerouslySetInnerHTML={{ __html: msg.content }}
-                style={{ display: 'inline-block', maxWidth: '100%' }}
-              />
-            </div>
-          ))}
-        </div>
+    <div style={{
+      fontFamily: 'Comic Sans MS, sans-serif',
+      padding: '1rem',
+      background: '#fffbee',
+      minHeight: '100vh'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>💬</span>
+        <h2 style={{ fontWeight: '700', fontSize: '1.2rem', color: '#5b3926' }}>
+          room: {room}
+        </h2>
       </div>
-      <input
-        type="text"
-        value={newMsg}
-        onChange={e => setNewMsg(e.target.value)}
-        placeholder="Type your message"
-      />
-      <button onClick={sendMessage}>Send</button>
+
+      {!roomExists && (
+        <p style={{ background: '#d4edda', color: '#155724', padding: '0.5rem 1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+          🎉 New room created!
+        </p>
+      )}
+
+      <div style={{
+        overflowY: 'auto',
+        padding: '0.5rem',
+        background: '#fff6d5',
+        borderRadius: '12px',
+        marginBottom: '1rem'
+      }}>
+        {messages.map((msg, i) => (
+          <div key={i} style={{
+            background: '#fff',
+            borderRadius: '10px',
+            padding: '0.5rem 0.75rem',
+            marginBottom: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.95rem',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+          }}>
+            <strong style={{ color: '#5b3926', marginRight: '0.5rem' }}>{msg.user_name}:</strong>
+            <span dangerouslySetInnerHTML={{ __html: msg.content }} style={{ flex: 1 }} />
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <input
+          type="text"
+          value={newMsg}
+          onChange={e => setNewMsg(e.target.value)}
+          placeholder="Type your message"
+          style={{
+            flex: 1,
+            padding: '0.5rem 1rem',
+            borderRadius: '999px',
+            border: '1px solid #ccc',
+            outline: 'none',
+            fontSize: '1rem'
+          }}
+        />
+        <button
+          onClick={sendMessage}
+          style={{
+            background: '#ffb347',
+            border: 'none',
+            borderRadius: '999px',
+            padding: '0.5rem 1rem',
+            color: '#fff',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          ➤
+        </button>
+      </div>
     </div>
   );
 }
