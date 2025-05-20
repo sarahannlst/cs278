@@ -60,7 +60,7 @@ const MainApp: React.FC<{
 
   return (
     <>
-      <main style={{ paddingBottom: '60px' }}>
+      <main style={{ paddingBottom: '60px', backgroundColor: '#fff8e1', minHeight: '100vh' }}>
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route
