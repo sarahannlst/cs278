@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import {  Navigate } from 'react-router-dom';
 import ChatRoom from './ChatRoom';
@@ -15,11 +15,27 @@ const MainApp: React.FC<{
   joined: boolean;
   setJoined: (j: boolean) => void;
 }> = ({ session, room, setRoom, joined, setJoined }) => {
-  const userName =
-    session?.user?.user_metadata?.full_name ||
-    session?.user?.email ||
-    'Anonymous';
+  const [userName, setUserName] = useState<string>('Anonymous');
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', session.user.id)
+        .single();
 
+      if (error) {
+        console.error('Error fetching user name:', error.message);
+        return;
+      }
+
+      if (data?.name) {
+        setUserName(data.name);
+      }
+    };
+
+    fetchUserName();
+  }, [session]);
   useEffect(() => {
     const fetchRoom = async () => {
       const { data, error } = await supabase
