@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
 interface ChatRoomProps {
@@ -19,6 +19,7 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
   const [newMsg, setNewMsg] = useState('');
   const [channel, setChannel] = useState<any>(null);
   const [roomExists, setRoomExists] = useState<boolean>(true);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     checkRoomExists(room);
@@ -46,6 +47,14 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
       supabase.removeChannel(ch);
     };
   }, [room]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   async function checkRoomExists(room: string) {
     const { data, error } = await supabase
@@ -100,12 +109,14 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
   }
 
   return (
-    <div style={{
-      fontFamily: 'Comic Sans MS, sans-serif',
-      padding: '1rem',
-      background: '#fffbee',
-      minHeight: '100vh'
-    }}>
+    <div
+      style={{
+        fontFamily: 'Comic Sans MS, sans-serif',
+        padding: '1rem',
+        background: '#fffbee',
+        minHeight: '100vh',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
         <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>💬</span>
         <h2 style={{ fontWeight: '700', fontSize: '1.2rem', color: '#5b3926' }}>
@@ -114,41 +125,58 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
       </div>
 
       {!roomExists && (
-        <p style={{ background: '#d4edda', color: '#155724', padding: '0.5rem 1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+        <p
+          style={{
+            background: '#d4edda',
+            color: '#155724',
+            padding: '0.5rem 1rem',
+            borderRadius: '12px',
+            marginBottom: '1rem',
+          }}
+        >
           🎉 New room created!
         </p>
       )}
 
-      <div style={{
-        overflowY: 'auto',
-        padding: '0.5rem',
-        background: '#fff6d5',
-        borderRadius: '12px',
-        marginBottom: '1rem'
-      }}>
+      <div
+        style={{
+          overflowY: 'auto',
+          padding: '0.5rem',
+          background: '#fff6d5',
+          borderRadius: '12px',
+          marginBottom: '1rem',
+        }}
+      >
         {messages.map((msg, i) => (
-          <div key={i} style={{
-            background: '#fff',
-            borderRadius: '10px',
-            padding: '0.5rem 0.75rem',
-            marginBottom: '0.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '0.95rem',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-          }}>
+          <div
+            key={i}
+            style={{
+              background: '#fff',
+              borderRadius: '10px',
+              padding: '0.5rem 0.75rem',
+              marginBottom: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.95rem',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            }}
+          >
             <strong style={{ color: '#5b3926', marginRight: '0.5rem' }}>{msg.user_name}:</strong>
-            <span dangerouslySetInnerHTML={{ __html: msg.content }} style={{ flex: 1 }} />
+            <span
+              dangerouslySetInnerHTML={{ __html: msg.content }}
+              style={{ flex: 1 }}
+            />
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <input
           type="text"
           value={newMsg}
-          onChange={e => setNewMsg(e.target.value)}
+          onChange={(e) => setNewMsg(e.target.value)}
           placeholder="Type your message"
           style={{
             flex: 1,
@@ -156,7 +184,7 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
             borderRadius: '999px',
             border: '1px solid #ccc',
             outline: 'none',
-            fontSize: '1rem'
+            fontSize: '1rem',
           }}
         />
         <button
@@ -168,7 +196,7 @@ function ChatRoom({ userName, room }: ChatRoomProps) {
             padding: '0.5rem 1rem',
             color: '#fff',
             fontWeight: 'bold',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         >
           ➤
