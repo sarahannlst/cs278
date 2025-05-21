@@ -43,32 +43,118 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
     else onAuth();
   };
 
+  const inputStyle = {
+    display: 'block',
+    width: '100%',
+    padding: '12px',
+    margin: '8px 0',
+    borderRadius: '8px',
+    border: '1px solid #F9E5B5',
+    backgroundColor: '#FFF8E1',
+    fontSize: '16px',
+    color: '#6D4C41',
+    boxSizing: 'border-box' as const
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#F9A825',
+    color: '#6D4C41',
+    border: 'none',
+    padding: '12px 20px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: '600' as const,
+    fontSize: '16px',
+    margin: '8px 8px 8px 0',
+    transition: 'background-color 0.3s ease',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+  };
+
   return (
-    <div>
-      <h2>Sign Up / Log In</h2>
-      <input
-        placeholder="Name (only for sign up)"
-        value={name}
-        onChange={e => setName(e.target.value)}
-      />
-      <input
-        placeholder="Room (only for sign up)"
-        value={room}
-        onChange={e => setRoom(e.target.value)}
-      />
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button onClick={handleSignUp}>Sign Up</button>
-      <button onClick={handleSignIn}>Log In</button>
+    <div style={{
+      maxWidth: '400px',
+      margin: '2rem auto',
+      padding: '2rem',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      backgroundColor: '#FFF8E1',
+      fontFamily: "'Comic Sans MS', 'Chalkboard SE', sans-serif",
+    }}>
+      <h2 style={{ 
+        color: '#6D4C41', 
+        marginBottom: '1.5rem',
+        fontSize: '24px',
+        fontWeight: 'bold',
+        textAlign: 'center'
+      }}>
+        join the feast
+      </h2>
+      
+      <div style={{
+        backgroundColor: '#FFF3CD',
+        borderRadius: '8px',
+        padding: '1.5rem',
+        marginBottom: '1rem'
+      }}>
+        <input
+          style={inputStyle}
+          placeholder="name (only for sign up)"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+        <input
+          style={inputStyle}
+          placeholder="room (only for sign up)"
+          value={room}
+          onChange={e => setRoom(e.target.value)}
+        />
+        <input
+          style={inputStyle}
+          placeholder="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <input
+          style={inputStyle}
+          type="password"
+          placeholder="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+        
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <button 
+            onClick={handleSignUp} 
+            style={buttonStyle}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F57F17')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#F9A825')}
+          >
+            sign up
+          </button>
+          <button 
+            onClick={handleSignIn} 
+            style={buttonStyle}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F57F17')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#F9A825')}
+          >
+            log in
+          </button>
+        </div>
+      </div>
+      
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: '1rem'
+      }}>
+        <span style={{ 
+          color: '#6D4C41',
+          fontSize: '14px',
+          opacity: 0.8
+        }}>
+          join the fun and track your food adventures!
+        </span>
+      </div>
     </div>
   );
 }
