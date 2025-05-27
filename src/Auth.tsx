@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
-import addHome from '/icons/add-to-home-ios.jpeg';
+import addHome from './icons/add-to-home-ios.jpeg';
 
 export default function Auth({ onAuth }: { onAuth: () => void }) {
   const [email, setEmail] = useState('');
