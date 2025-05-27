@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -13,6 +13,29 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
   const [caption, setCaption] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [challengeTitle, setChallengeTitle] = useState<string>('Loading...');
+
+  // Fetch challenge title from database
+  useEffect(() => {
+    const fetchChallengeTitle = async () => {
+      if (!challengeId) return;
+
+      const { data, error } = await supabase
+        .from('challenges')
+        .select('title')
+        .eq('id', challengeId)
+        .single();
+
+      if (error) {
+        console.error('Failed to fetch challenge title:', error.message);
+        setChallengeTitle('Challenge');
+      } else {
+        setChallengeTitle(data.title);
+      }
+    };
+
+    fetchChallengeTitle();
+  }, [challengeId]);
 
   const handleUpload = async () => {
     if (!imageFile || !caption.trim()) {
@@ -58,7 +81,6 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       return;
     }
 
-    // 🧩 Fetch user's room **and name** from profile table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('room, name')
@@ -79,7 +101,7 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
     await supabase.from('messages').insert([
       {
         user_name: 'System',
-        content: `🎉 <b>${userName}</b> completed a challenge!<br/>Caption: ${caption}<br/><img src="${publicUrl}" alt="Challenge Image" style="max-width: 25%;" />`,
+        content: `🎉 <b>${userName}</b> completed a challenge ${challengeId}: ${challengeTitle}!<br/>Caption: ${caption}<br/><img src="${publicUrl}" alt="Challenge Image" style="max-width: 25%;" />`,
         room,
       },
     ]);
@@ -118,9 +140,12 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
           fontWeight: 'normal',
           fontSize: '22px',
         }}>
-          <span style={{ fontWeight: 'bold' }}>food:</span> complete your challenge
+          <span style={{ fontWeight: 'bold' }}>{challengeTitle}:</span> complete your challenge
         </h2>
       </div>
+
+      {/* ...rest of your component remains unchanged... */}
+
 
       {imageFile ? (
         <div style={{
