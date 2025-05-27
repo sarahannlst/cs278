@@ -25,6 +25,7 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [completedChallenges, setCompletedChallenges] = useState<Challenge[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -49,6 +50,16 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
 
         const completedIds = completed ? completed.map((row) => row.challenge_id) : [];
 
+        // Fetch completed challenge details
+        const { data: completedData, error: completedDataError } = await supabase
+          .from('challenges')
+          .select('*')
+          .in('id', completedIds);
+
+        if (completedDataError) throw completedDataError;
+        setCompletedChallenges(completedData || []);
+
+        // Fetch uncompleted challenge details
         let query = supabase.from('challenges').select('*');
         if (completedIds.length > 0) {
           query = query.not('id', 'in', `(${completedIds.join(',')})`);
@@ -59,6 +70,7 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
 
         setChallenges(uncompleted || []);
 
+        // Fetch leaderboard
         const { data: leaderboardData, error: leaderboardError } = await supabase
           .from('leaderboard')
           .select('*')
@@ -90,7 +102,7 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
         <p>Loading your fun tasks...</p>
       ) : (
         <>
-          {/* Challenges Section */}
+          {/* Uncompleted Challenges Section */}
           {challenges.length === 0 ? (
             <p>🎉 You've completed all available challenges!</p>
           ) : (
@@ -110,7 +122,7 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
                   }}
                 >
                   <div>
-                    <strong style={{ color: '#5c3c10' }}>{challenge.title}</strong>: {challenge.description}
+                    <strong style={{ color: '#5c3c10' }}>{challenge.title}</strong> {challenge.description}
                   </div>
                   <button
                     onClick={() => handleCompleteClick(challenge.id)}
@@ -124,6 +136,29 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
                   >
                     📸
                   </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Completed Challenges Section */}
+          <h2 style={{ fontSize: '1.5rem', color: '#5c3c10', marginTop: '2rem' }}>✅ completed challenges</h2>
+          {completedChallenges.length === 0 ? (
+            <p>You haven't completed any challenges yet.</p>
+          ) : (
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
+              {completedChallenges.map((challenge) => (
+                <li
+                  key={challenge.id}
+                  style={{
+                    background: '#d9ead3',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    marginBottom: '0.75rem',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <strong style={{ color: '#38761d' }}>{challenge.title}</strong> {challenge.description}
                 </li>
               ))}
             </ul>
@@ -159,14 +194,15 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
                         >
                           <div style={{ fontSize: '2rem' }}>🐭</div>
                         </div>
-                        <div style={{ marginTop: '0.3rem', fontWeight: 'bold' }}>{ranks[index]} {entry.name}</div>
+                        <div style={{ marginTop: '0.3rem', fontWeight: 'bold' }}>
+                          {ranks[index]} {entry.name}
+                        </div>
                       </div>
                     );
                   })}
               </div>
             </div>
           )}
-
         </>
       )}
     </div>
