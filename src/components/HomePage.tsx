@@ -95,7 +95,7 @@ const HomePage: React.FC<HomePageProps> = ({ title, userId, room }) => {
   };
 
   return (
-    <div style={{ padding: '1rem', fontFamily: "'Comic Sans MS', cursive, sans-serif", background: '#fff7e6' }}>
+    <div style={{ padding: '1rem', fontFamily: "'Comic Sans MS', sans-serif", background: '#fff7e6' }}>
       <h2 style={{ fontSize: '1.5rem', color: '#5c3c10', marginBottom: '1rem' }}>🍽 your leftovers</h2>
 
       {loading ? (

@@ -114,7 +114,7 @@ const ChallengeCompletePage: React.FC<ChallengeCompletePageProps> = ({ userId })
       backgroundColor: '#FFFFFF',
       minHeight: '100vh',
       padding: '20px',
-      fontFamily: "'Comic Sans MS', 'Chalkboard SE', sans-serif",
+      fontFamily: "'Comic Sans MS', sans-serif",
     }}>
       <div style={{
         display: 'flex',
